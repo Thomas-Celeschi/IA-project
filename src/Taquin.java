@@ -1,15 +1,12 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Taquin {
     private int nbRow = 0;
     private int nbColumn = 0;
     private char[][] etatInitial;
     private char[][] etatFinal;
-    private Noeud firtStep;
 
 
     public void createTaquin(String filename) throws IOException {
@@ -42,8 +39,6 @@ public class Taquin {
                 etatFinal[row][column] = listFinals.get(row).charAt(column);
             }
         }
-        firtStep = new Noeud(etatInitial, this);
-//        open.add(firtStep);
     }
 
     public void readTaquin() {
@@ -67,6 +62,61 @@ public class Taquin {
         System.out.println("nbCol : " + nbColumn + "\n");
     }
 
+    public void start() throws IOException {
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Quelle fichier voulez-vous tester ?");
+        String file = scanner.next();
+
+        createTaquin("src/file/" + file + ".txt");
+
+        readTaquin();
+
+        while (true) {
+
+            System.out.println("1: DPF, 2: BF, 3: MD, autre: exit");
+            int parcoursInt = scanner.nextInt();
+
+            Parcours parcours;
+
+            if (parcoursInt == 1) {
+                parcours = new Longueur(this);
+            } else if (parcoursInt == 2) {
+                parcours = new Largeur(this);
+            } else if (parcoursInt == 3) {
+                parcours = new Meilleur(this);
+            } else {
+                break;
+            }
+
+            System.out.println("0: sans, 1: Distance, 2: Bonne Position, autre: exit");
+            int heuristiqueInt = scanner.nextInt();
+
+            if (heuristiqueInt == 0) {
+                parcours.setHeuristique(null);
+            } else if (heuristiqueInt == 1) {
+                parcours.setHeuristique(new HeuristiqueDistancePosition(this));
+            } else if (heuristiqueInt == 2) {
+                parcours.setHeuristique(new HeuristiqueGoodPosition(this));
+            } else {
+                break;
+            }
+
+            parcours.readSolution();
+
+            System.out.println("Voulez-vous tester un autre parcours ?");
+        }
+    }
+
+    public int getPossibilities() {
+        int possibilities = 1;
+        for(int i = 1; i <= nbColumn * nbRow; i++) {
+            possibilities = possibilities * i;
+        }
+        return possibilities / 2;
+    }
+
     public int getNbRow() {
         return nbRow;
     }
@@ -83,7 +133,4 @@ public class Taquin {
         return etatFinal;
     }
 
-    public Noeud getFirtStep() {
-        return firtStep;
-    }
 }

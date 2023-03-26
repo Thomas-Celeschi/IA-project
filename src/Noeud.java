@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Noeud {
 
     private final Taquin taquin;
+    private Optional<Noeud> pere;
     private final char[][] noeud;
 
     private int emptyRow;
@@ -15,12 +17,15 @@ public class Noeud {
     public Noeud(char[][] noeud, Taquin taquin) {
         this.noeud = noeud;
         this.taquin = taquin;
-        heuristique = calculateHeuristique();
+        this.pere = Optional.empty();
         findEmpty();
     }
 
-    private Integer calculateHeuristique() {
-        return 0;
+    public Noeud(Noeud pere, char[][] noeud, Taquin taquin) {
+        this.noeud = noeud;
+        this.taquin = taquin;
+        this.pere = Optional.of(pere);
+        findEmpty();
     }
 
     public void findEmpty() {
@@ -36,8 +41,6 @@ public class Noeud {
 
 
     public List<Noeud> generateNext() {
-        System.out.println("emptyRow : " + emptyRow);
-        System.out.println("emptyCol : " + emptyCol);
         if(emptyCol != 0) {
             generateLeft();
         }
@@ -62,7 +65,7 @@ public class Noeud {
         }
         left[emptyRow][emptyCol] = left[emptyRow][emptyCol-1];
         left[emptyRow][emptyCol-1] =  ' ';
-        Noeud leftTaquin = new Noeud(left, taquin);
+        Noeud leftTaquin = new Noeud(this, left, taquin);
         nextSteps.add(leftTaquin);
     }
 
@@ -75,7 +78,7 @@ public class Noeud {
         }
         up[emptyRow][emptyCol] = up[emptyRow-1][emptyCol];
         up[emptyRow-1][emptyCol] =  ' ';
-        Noeud upTaquin = new Noeud(up, taquin);
+        Noeud upTaquin = new Noeud(this, up, taquin);
         nextSteps.add(upTaquin);
     }
 
@@ -88,7 +91,7 @@ public class Noeud {
         }
         right[emptyRow][emptyCol] = right[emptyRow][emptyCol+1];
         right[emptyRow][emptyCol+1] = ' ';
-        Noeud rightTaquin = new Noeud(right, taquin);
+        Noeud rightTaquin = new Noeud(this, right, taquin);
         nextSteps.add(rightTaquin);
     }
 
@@ -101,7 +104,7 @@ public class Noeud {
         }
         down[emptyRow][emptyCol] = down[emptyRow+1][emptyCol];
         down[emptyRow+1][emptyCol] = ' ';
-        Noeud downTaquin = new Noeud(down, taquin);
+        Noeud downTaquin = new Noeud(this, down, taquin);
         nextSteps.add(downTaquin);
 
     }
@@ -126,11 +129,23 @@ public class Noeud {
         return noeud;
     }
 
+    public int getNbParcours() {
+        return nbParcours;
+    }
+
     public void setNbParcours(int nbParcours) {
         this.nbParcours = nbParcours;
     }
 
-    public List<Noeud> getNextSteps() {
-        return nextSteps;
+    public Optional<Noeud> getPere() {
+        return pere;
+    }
+
+    public Integer getHeuristique() {
+        return heuristique;
+    }
+
+    public void setHeuristique(Integer heuristique) {
+        this.heuristique = heuristique;
     }
 }
