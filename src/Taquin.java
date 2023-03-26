@@ -58,15 +58,13 @@ public class Taquin {
             System.out.println();
         }
         System.out.println();
-        System.out.println("nbRow : " + nbRow);
-        System.out.println("nbCol : " + nbColumn + "\n");
     }
 
     public void start() throws IOException {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Quelle fichier voulez-vous tester ?");
+        System.out.println("Quel fichier voulez-vous tester ?");
         String file = scanner.next();
 
         createTaquin("src/file/" + file + ".txt");

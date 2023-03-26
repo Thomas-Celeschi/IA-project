@@ -6,7 +6,6 @@ public abstract class Parcours {
     protected int cptVisite = 0;
     protected List<Noeud> open = new ArrayList<>();
     protected Noeud firtStep;
-
     protected Noeud solution;
     protected Heuristique heuristique;
 
