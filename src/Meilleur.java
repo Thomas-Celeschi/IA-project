@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Meilleur extends Parcours {
 
-    private final List<Noeud> closed = new LinkedList<>();
+    private final List<Noeud> open = new LinkedList<>();
 
     public Meilleur(Taquin taquin) {
         super(taquin);
@@ -24,7 +24,7 @@ public class Meilleur extends Parcours {
         }
 
         Noeud actualNoeud = firtStep;
-        open.add(actualNoeud);
+        closed.add(actualNoeud);
         actualNoeud.setNbParcours(cptVisite++);
 
         while (!check(actualNoeud)) {
@@ -36,10 +36,10 @@ public class Meilleur extends Parcours {
             }
 
             nexts.removeAll(removeClosedVisited(nexts));
-            closed.addAll(nexts);
-            closed.sort(new Comparable());
-            actualNoeud = closed.remove(0);
-            open.add(actualNoeud);
+            open.addAll(nexts);
+            open.sort(new Comparable());
+            actualNoeud = open.remove(0);
+            closed.add(actualNoeud);
             assert actualNoeud != null;
             actualNoeud.setNbParcours(cptVisite++);
 
@@ -54,7 +54,7 @@ public class Meilleur extends Parcours {
 
     public List<Noeud> removeClosedVisited(List<Noeud> nexts) {
         List<Noeud> toRemove = new ArrayList<>();
-        for(Noeud noeud : closed) {
+        for(Noeud noeud : open) {
             for(Noeud next : nexts) {
                 if(Arrays.deepEquals(noeud.getNoeud(), next.getNoeud())) {
                     if(noeud.getHeuristique() > next.getHeuristique()) {

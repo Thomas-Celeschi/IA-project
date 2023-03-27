@@ -4,7 +4,7 @@ public abstract class Parcours {
 
     protected Taquin taquin;
     protected int cptVisite = 0;
-    protected List<Noeud> open = new ArrayList<>();
+    protected List<Noeud> closed = new ArrayList<>();
     protected Noeud firtStep;
     protected Noeud solution;
     protected Heuristique heuristique;
@@ -19,7 +19,7 @@ public abstract class Parcours {
     }
 
     public void readOpen() {
-        for(Noeud noeud : open) {
+        for(Noeud noeud : closed) {
             System.out.println("Position : " + solution.getNbParcours());
             noeud.readActualStep();
         }
@@ -44,7 +44,7 @@ public abstract class Parcours {
 
     public List<Noeud> removeOpenVisited(List<Noeud> nexts) {
         List<Noeud> toRemove = new ArrayList<>();
-        for(Noeud noeud : open) {
+        for(Noeud noeud : closed) {
             for(Noeud next : nexts) {
                 if(Arrays.deepEquals(noeud.getNoeud(), next.getNoeud())) {
                     toRemove.add(next);

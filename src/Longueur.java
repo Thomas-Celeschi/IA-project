@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Longueur extends Parcours {
 
-    private final Stack<Noeud> closed = new Stack<>();
+    private final Stack<Noeud> open = new Stack<>();
 
     public Longueur(Taquin taquin) {
         super(taquin);
@@ -12,7 +12,7 @@ public class Longueur extends Parcours {
     @Override
     protected Noeud start() {
         Noeud actualNoeud = firtStep;
-        open.add(actualNoeud);
+        closed.add(actualNoeud);
         actualNoeud.setNbParcours(cptVisite++);
 
         while (!check(actualNoeud)) {
@@ -28,15 +28,15 @@ public class Longueur extends Parcours {
 
                 nexts.sort(new Comparable());
                 for(int i = nexts.size() - 1; i >= 0; i--) {
-                    closed.push(nexts.get(i));
+                    open.push(nexts.get(i));
                 }
 
             } else {
-                closed.addAll(nexts);
+                open.addAll(nexts);
             }
 
-            actualNoeud = closed.pop();
-            open.add(actualNoeud);
+            actualNoeud = open.pop();
+            closed.add(actualNoeud);
             actualNoeud.setNbParcours(cptVisite++);
 
             if(cptVisite == taquin.getPossibilities()) {
@@ -49,7 +49,7 @@ public class Longueur extends Parcours {
 
     public List<Noeud> removeClosedVisited(List<Noeud> nexts) {
         List<Noeud> toRemove = new ArrayList<>();
-        for(Noeud noeud : closed) {
+        for(Noeud noeud : open) {
             for(Noeud next : nexts) {
                 if(Arrays.deepEquals(noeud.getNoeud(), next.getNoeud())) {
                     toRemove.add(next);

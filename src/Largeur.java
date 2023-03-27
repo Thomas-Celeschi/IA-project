@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Largeur extends Parcours{
 
-    private final Queue<Noeud> closed = new ArrayDeque<>();
+    private final Queue<Noeud> open = new ArrayDeque<>();
 
     public Largeur(Taquin taquin) {
         super(taquin);
@@ -11,7 +11,7 @@ public class Largeur extends Parcours{
     @Override
     protected Noeud start() {
         Noeud actualNoeud = firtStep;
-        open.add(actualNoeud);
+        closed.add(actualNoeud);
         actualNoeud.setNbParcours(cptVisite++);
 
         while (!check(actualNoeud)) {
@@ -29,11 +29,12 @@ public class Largeur extends Parcours{
 
             }
 
-            closed.addAll(nexts);
-            actualNoeud = closed.poll();
-            open.add(actualNoeud);
+            open.addAll(nexts);
+            actualNoeud = open.poll();
+            closed.add(actualNoeud);
             assert actualNoeud != null;
             actualNoeud.setNbParcours(cptVisite++);
+            System.out.println(cptVisite);
 
             if(cptVisite == taquin.getPossibilities()) {
                 return null;
@@ -44,7 +45,7 @@ public class Largeur extends Parcours{
     }
     public List<Noeud> removeClosedVisited(List<Noeud> nexts) {
         List<Noeud> toRemove = new ArrayList<>();
-        for(Noeud noeud : closed) {
+        for(Noeud noeud : open) {
             for(Noeud next : nexts) {
                 if(Arrays.deepEquals(noeud.getNoeud(), next.getNoeud())) {
                     toRemove.add(next);
