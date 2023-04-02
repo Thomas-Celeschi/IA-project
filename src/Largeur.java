@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Largeur extends Parcours{
 
@@ -9,7 +10,11 @@ public class Largeur extends Parcours{
     }
 
     @Override
-    protected Noeud start() {
+    protected Noeud start(int time) {
+
+        long time1 = System.nanoTime();
+        long time2;
+
         Noeud actualNoeud = firtStep;
         closed.add(actualNoeud);
         actualNoeud.setNbParcours(cptVisite++);
@@ -34,12 +39,17 @@ public class Largeur extends Parcours{
             closed.add(actualNoeud);
             assert actualNoeud != null;
             actualNoeud.setNbParcours(cptVisite++);
-            System.out.println(cptVisite);
 
-            if(cptVisite == taquin.getPossibilities()) {
+            time2 = System.nanoTime();
+
+            if(time2 - time1 >= (long) time *60*1000000000) {
+                System.out.println("La résolution de ce taquin avec l'algorithme BF est trop longue \n");
                 return null;
             }
         }
+
+        time2 = System.nanoTime();
+        System.out.println("Temps d'execution : " + TimeUnit.NANOSECONDS.toMillis(time2 - time1) + " milisecondes");
 
         return actualNoeud;
     }

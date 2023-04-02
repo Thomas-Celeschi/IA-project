@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public abstract class Parcours {
 
@@ -25,20 +26,18 @@ public abstract class Parcours {
         }
     }
 
-    public void readSolution() {
-        solution = start();
-        if(solution == null) {
-            System.out.println("Pas de solution pour ce taquin");
-        } else {
+    public void readSolution(int time) {
+        solution = start(time);
+        if(solution != null) {
             System.out.println(solution.getNbParcours());
-//            while(solution.getPere().isPresent()) {
-//                System.out.println("Position : " + solution.getNbParcours());
-//                solution.readActualStep();
-//
-//                solution = solution.getPere().get();
-//            }
-//            System.out.println("Position : " + solution.getNbParcours());
-//            solution.readActualStep();
+                        while(solution.getPere().isPresent()) {
+                System.out.println("Position : " + solution.getNbParcours());
+                solution.readActualStep();
+
+                solution = solution.getPere().get();
+            }
+            System.out.println("Position : " + solution.getNbParcours());
+            solution.readActualStep();
         }
     }
 
@@ -58,5 +57,5 @@ public abstract class Parcours {
         this.heuristique = heuristique;
     }
 
-    protected abstract Noeud start();
+    protected abstract Noeud start(int time);
 }

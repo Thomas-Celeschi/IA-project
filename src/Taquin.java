@@ -13,30 +13,46 @@ public class Taquin {
         Scanner scanner = new Scanner(new File(filename));
         List<String> listInitials = new ArrayList<>();
         List<String> listFinals = new ArrayList<>();
+
         if (scanner.hasNext()) {
             nbRow = Integer.parseInt(scanner.nextLine());
         } else {
             System.out.println("fichier vide");
         }
-        for (int i = 0; i < nbRow; i++) {
+
+        for(int i = 0; i < nbRow; i++) {
             String nextLine = scanner.nextLine();
-            if (nextLine.length() != nbColumn) {
-                listInitials.add(nextLine + " ");
+            System.out.println(nextLine);
+            listInitials.add(nextLine);
+        }
+
+        for(int i = 0; i < nbRow; i++) {
+            String nextLine = scanner.nextLine();
+            listFinals.add(nextLine);
+        }
+
+
+        for(String s : listInitials) {
+            if(s.length() > nbColumn) {
+                nbColumn = s.length();
             }
         }
-        for (int i = 0; i < nbRow; i++) {
-            String nextLine = scanner.nextLine();
-            if (nextLine.length() != nbColumn) {
-                listFinals.add(nextLine + " ");
-            }
-        }
-        nbColumn = listInitials.get(0).length() - 1;
+
         etatInitial = new char[nbRow][nbColumn];
         etatFinal = new char[nbRow][nbColumn];
+
         for (int row = 0; row < nbRow; ++row) {
             for (int column = 0; column < nbColumn; ++column) {
-                etatInitial[row][column] = listInitials.get(row).charAt(column);
-                etatFinal[row][column] = listFinals.get(row).charAt(column);
+                if(listInitials.get(row).length() < nbColumn && column+1 == nbColumn) {
+                    etatInitial[row][column] = ' ';
+                } else {
+                    etatInitial[row][column] = listInitials.get(row).charAt(column);
+                }
+                if(listFinals.get(row).length() < nbColumn && column+1 == nbColumn) {
+                    etatFinal[row][column] = ' ';
+                } else {
+                    etatFinal[row][column] = listFinals.get(row).charAt(column);
+                }
             }
         }
     }
@@ -71,48 +87,87 @@ public class Taquin {
 
         readTaquin();
 
-        while (true) {
+        if(isSoluble()) {
+            test:while (true) {
 
-            System.out.println("1: DPF, 2: BF, 3: MD, autre: exit");
-            int parcoursInt = scanner.nextInt();
+                System.out.println("1: DPF, 2: BF, 3: MD, autre: exit");
+                int parcoursInt = scanner.nextInt();
 
-            Parcours parcours;
+                Parcours parcours;
 
-            if (parcoursInt == 1) {
-                parcours = new Longueur(this);
-            } else if (parcoursInt == 2) {
-                parcours = new Largeur(this);
-            } else if (parcoursInt == 3) {
-                parcours = new Meilleur(this);
-            } else {
-                break;
+                switch (parcoursInt) {
+                    case 1 -> parcours = new Longueur(this);
+                    case 2 -> parcours = new Largeur(this);
+                    case 3 -> parcours = new Meilleur(this);
+                    default -> {
+                        break test;
+                    }
+                }
+
+                System.out.println("1: sans, 2: Distance, 3: Bonne Position, autre: exit");
+                int heuristiqueInt = scanner.nextInt();
+
+
+                switch (heuristiqueInt) {
+                    case 1 -> parcours.setHeuristique(null);
+                    case 2 -> parcours.setHeuristique(new HeuristiqueDistancePosition(this));
+                    case 3 -> parcours.setHeuristique(new HeuristiqueGoodPosition(this));
+                    default -> {
+                        break test;
+                    }
+                }
+
+                System.out.println("Comment de temps en minutes, voulez vous que l'éxécution dure au maximum ?");
+
+                int time = scanner.nextInt();
+                parcours.readSolution(time);
+
+                System.out.println("Voulez-vous tester un autre parcours ?");
             }
-
-            System.out.println("0: sans, 1: Distance, 2: Bonne Position, autre: exit");
-            int heuristiqueInt = scanner.nextInt();
-
-            if (heuristiqueInt == 0) {
-                parcours.setHeuristique(null);
-            } else if (heuristiqueInt == 1) {
-                parcours.setHeuristique(new HeuristiqueDistancePosition(this));
-            } else if (heuristiqueInt == 2) {
-                parcours.setHeuristique(new HeuristiqueGoodPosition(this));
-            } else {
-                break;
-            }
-
-            parcours.readSolution();
-
-            System.out.println("Voulez-vous tester un autre parcours ?");
+        } else {
+            System.out.println("Ce taquin n'a pas de solution");
         }
+
+
     }
 
-    public int getPossibilities() {
-        int possibilities = 1;
-        for(int i = 1; i <= nbColumn * nbRow; i++) {
-            possibilities = possibilities * i;
+    public boolean isSoluble() {
+        List<Character> debut = new ArrayList<>();
+        List<Character> fin = new ArrayList<>();
+        int nbDeplacement = 0;
+        int deplacementVide = 0;
+
+        int debutVideRow = 0;
+        int debutVideCol = 0;
+        int finVideRow = 0;
+        int finVideCol = 0;
+
+        for(int i = 0; i < nbRow; i++) {
+            for(int j = 0; j <nbColumn; j++) {
+                if(etatInitial[i][j] == ' ') {
+                    debutVideRow = i;
+                    debutVideCol = j;
+                }
+                if(etatFinal[i][j] == ' ') {
+                    finVideRow = i;
+                    finVideCol = j;
+                }
+                debut.add(etatInitial[i][j]);
+                fin.add(etatFinal[i][j]);
+            }
         }
-        return possibilities / 2;
+
+        deplacementVide = Math.abs(debutVideRow - finVideRow) + Math.abs(debutVideCol - finVideCol);
+
+        for(int j = debut.size()-1; j > 0; j--) {
+            if(debut.get(j) != fin.get(j)) {
+                int index = debut.indexOf(fin.get(j));
+                Collections.swap(debut, j, index);
+                nbDeplacement++;
+            }
+        }
+
+        return nbDeplacement % 2 == deplacementVide % 2;
     }
 
     public int getNbRow() {

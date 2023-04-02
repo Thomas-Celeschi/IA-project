@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Meilleur extends Parcours {
 
@@ -9,7 +10,11 @@ public class Meilleur extends Parcours {
     }
 
     @Override
-    protected Noeud start() {
+    protected Noeud start(int time) {
+
+        long time1 = System.nanoTime();
+        long time2;
+
         if(heuristique == null) {
             Scanner scanner = new Scanner(System.in);
             System.out.println("L'heuristique ne peut être null pour le meilleur d'abord");
@@ -43,10 +48,16 @@ public class Meilleur extends Parcours {
             assert actualNoeud != null;
             actualNoeud.setNbParcours(cptVisite++);
 
-            if(cptVisite == taquin.getPossibilities()) {
+            time2 = System.nanoTime();
+
+            if(time2 - time1 >= (long) time *60*1000000000) {
+                System.out.println("La résolution de ce taquin avec l'algorithme MD est trop longue \n");
                 return null;
             }
         }
+
+        time2 = System.nanoTime();
+        System.out.println("Temps d'execution : " + TimeUnit.NANOSECONDS.toMillis(time2 - time1) + " milisecondes");
 
         return actualNoeud;
 
